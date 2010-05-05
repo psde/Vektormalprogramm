@@ -17,10 +17,14 @@ public class Main {
 		window.setDrawingListener(eventHandler);
 		
 		Circle foo = new Circle(new Point(10, 10), 50, Color.blue);
+		foo.setSelected(true);
 		manager.addShape(foo);
 		
 		Circle foo2 = new Circle(new Point(30, 35), 50, Color.blue);
+		foo2.setSelected(true);
 		manager.addShape(foo2);
+		
+		manager.groupSelectedShapes();
 	}
 
 }

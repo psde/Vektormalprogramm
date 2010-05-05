@@ -3,8 +3,6 @@ package de.hska.faki.app;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.ArrayList;
-
 import de.hska.faki.gui.drawing.DrawingListener;
 
 public class EventHandler implements DrawingListener {
@@ -12,10 +10,13 @@ public class EventHandler implements DrawingListener {
 	private ShapeManager manager;
 	private ShapeView view;
 	
+	private Point moveOffset;
+	
 	public EventHandler(ShapeManager manager, ShapeView view)
 	{
 		this.manager = manager;
 		this.view = view;
+		this.moveOffset = new Point(0,0);
 	}
 
 	@Override
@@ -44,26 +45,24 @@ public class EventHandler implements DrawingListener {
 
 	@Override
 	public int getSelectedFigureCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.manager.getSelectedShapesCount();
 	}
 
 	@Override
 	public void groupFigures() {
-		// TODO Auto-generated method stub
-
+		this.manager.groupSelectedShapes();
 	}
 
 	@Override
 	public boolean isGroupSelected() {
-		// TODO Auto-generated method stub
+		if(this.manager.getSelectedGroupsCount() > 0) return true;
 		return false;
 	}
 
 	@Override
 	public boolean isModelChanged() {
-		// TODO Auto-generated method stub
-		return false;
+		// TODO DEBUG
+		return false; //this.manager.hasChanged();
 	}
 
 	@Override
@@ -92,8 +91,14 @@ public class EventHandler implements DrawingListener {
 
 	@Override
 	public void selectFigure(Point pos, boolean shiftPressed) {
-		// TODO Auto-generated method stub
+		if(!shiftPressed)
+			this.manager.deselectAll();
+		
+		Shape selectedShape = this.manager.getShapeAtPoint(pos);
+		if(selectedShape != null)
+			this.manager.selectShape(selectedShape);
 
+		this.view.updateRect();
 	}
 
 	@Override
@@ -113,14 +118,17 @@ public class EventHandler implements DrawingListener {
 		if(newShape == null) return;
 		
 		manager.addShape(newShape);
-		this.view.updateUI();
-		this.view.repaint();
+		this.view.updateRect();
 	}
 
 	@Override
 	public void startMoveFigure(Point pos) {
-		// TODO Auto-generated method stub
-
+		this.selectFigure(pos, false);
+		
+		Shape selectedShape = this.manager.getFirstSelectedShape();
+		if(selectedShape == null) return;
+		
+		this.moveOffset = new Point(pos.x - selectedShape.getOrigin().x, pos.y - selectedShape.getOrigin().y);
 	}
 
 	@Override
@@ -131,18 +139,27 @@ public class EventHandler implements DrawingListener {
 
 	@Override
 	public void workCreateFigure(Point pos) {
-		ArrayList<Shape> shapes = this.manager.getShapes();
-		Shape topShape = shapes.get(shapes.size() - 1);
+		Shape topShape = this.manager.getTopShape();
 		
 		topShape.setDimension(new Dimension(pos.x - topShape.getOrigin().x, pos.y - topShape.getOrigin().y));
-		this.view.updateUI();
-		this.view.repaint();
+		topShape.update();
+		
+		this.view.updateRect();
 	}
 
 	@Override
 	public void workMoveFigure(Point pos) {
-		// TODO Auto-generated method stub
-
+		if(this.manager.getSelectedShapesCount() != 1) return;
+		
+		Point newPosition = new Point(pos.x - moveOffset.x, pos.y - moveOffset.y);
+		
+		for (Shape curShape : manager.getShapes()) {
+			if(curShape.isSelected())
+			{
+				curShape.setOrigin(newPosition);
+			}
+		}
+		this.view.updateRect();
 	}
 
 }

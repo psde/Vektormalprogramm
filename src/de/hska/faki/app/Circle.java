@@ -2,11 +2,12 @@ package de.hska.faki.app;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
 public class Circle extends Shape{
+	private static final long serialVersionUID = 6670372647131320788L;
+
 	public Circle(Point origin, int radius, Color color) {
 		super(origin, new Dimension(radius, radius), color);
 	}
@@ -33,4 +34,17 @@ public class Circle extends Shape{
 		
 		super.dimension = new Dimension(max, max);
 	}
+
+	@Override
+	public Circle clone() {
+		Circle newCircle = new Circle((Point)this.origin.clone(), this.dimension.width, this.color);
+		return newCircle;
+	}
+	
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }
