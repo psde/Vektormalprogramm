@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
@@ -32,9 +33,15 @@ public class ShapeView extends JPanel {
 		{
 			shapes.get(i).paintComponent(gr2D);
 		}*/
-		
+		/*
 		for (Shape curShape : manager.getShapes()) {
 			curShape.paintComponent(gr2D);
+		}*/
+		
+		ArrayList<Shape> shapes = manager.getShapes();
+		for(int i = shapes.size()-1; i != -1; i--)
+		{
+			shapes.get(i).paintComponent(gr2D);
 		}
 	}
 	

@@ -4,10 +4,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.io.Serializable;
 
 import javax.swing.JPanel;
 
-public abstract class Shape extends JPanel {
+public abstract class Shape extends JPanel implements Cloneable, Comparable<Shape>, Serializable {
 	private static final long serialVersionUID = 2550836039772833235L;
 	
 	protected Point origin;
@@ -23,7 +24,6 @@ public abstract class Shape extends JPanel {
 	}
 	
 	public abstract void paintComponent(Graphics2D gr);
-	public abstract void update();
 	public abstract Shape clone();
 	
 	public Point getOrigin()
@@ -80,5 +80,20 @@ public abstract class Shape extends JPanel {
 			return true;
 		
 		return false;
+	}
+	
+	private double getBoundingBoxSize()
+	{
+		return this.dimension.getHeight() * this.dimension.getWidth();
+	}
+	
+	public int compareTo(Shape shape) {
+		if (Double.compare(getBoundingBoxSize(), shape.getBoundingBoxSize()) == 0) {
+			return 0;
+		}
+		else if (Double.compare(getBoundingBoxSize(), shape.getBoundingBoxSize()) < 0) {
+			return -1;
+		}
+		return 1;
 	}
 }

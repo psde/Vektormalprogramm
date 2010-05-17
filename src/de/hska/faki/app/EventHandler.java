@@ -3,6 +3,8 @@ package de.hska.faki.app;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.util.ArrayList;
+
 import de.hska.faki.gui.drawing.DrawingListener;
 
 public class EventHandler implements DrawingListener {
@@ -12,23 +14,54 @@ public class EventHandler implements DrawingListener {
 	
 	private Point moveOffset;
 	
+	private ArrayList<Shape> clipboard;
+	
 	public EventHandler(ShapeManager manager, ShapeView view)
 	{
 		this.manager = manager;
 		this.view = view;
 		this.moveOffset = new Point(0,0);
+		this.clipboard = new ArrayList<Shape>();
 	}
 
 	@Override
 	public void copyFigures() {
-		// TODO Auto-generated method stub
+		this.clipboard.clear();
+		ArrayList<Shape> shapes = this.manager.getSelection();
+		for(Shape curShape : shapes)
+		{
+			this.clipboard.add(curShape.clone());
+		}
+		this.view.updateRect();
+	}
 
+	@Override
+	public void pasteFigures() {
+		if(this.clipboard.isEmpty())
+			return;
+		
+		for(Shape curShape : this.clipboard)
+		{
+			Point newOrigin = curShape.getOrigin();
+			newOrigin.x += 10;
+			newOrigin.y += 10;
+			curShape.setOrigin(newOrigin); 
+			this.manager.addShape(curShape);
+		}
+		
+		this.clipboard.clear();
+		
+		this.view.updateRect();
 	}
 
 	@Override
 	public void deleteFigures() {
-		// TODO Auto-generated method stub
-
+		ArrayList<Shape> shapes = this.manager.getSelection();
+		for(Shape curShape : shapes)
+		{
+			this.manager.erase(curShape);
+		}
+		this.view.updateRect();
 	}
 
 	@Override
@@ -51,6 +84,7 @@ public class EventHandler implements DrawingListener {
 	@Override
 	public void groupFigures() {
 		this.manager.groupSelectedShapes();
+		this.view.updateRect();
 	}
 
 	@Override
@@ -61,33 +95,42 @@ public class EventHandler implements DrawingListener {
 
 	@Override
 	public boolean isModelChanged() {
-		// TODO DEBUG
-		return false; //this.manager.hasChanged();
+		return this.manager.hasChanged();
+	}
+	
+	@Override
+	public void saveModel(String fileName) {
+		IOHandler io = new IOHandler();
+		io.write(this.manager.getShapes(), fileName);
+		this.manager.setChanges(false);
 	}
 
 	@Override
 	public void loadModel(String fileName) {
-		// TODO Auto-generated method stub
-
+		IOHandler io = new IOHandler();
+		this.manager.reset(io.read(fileName));
+		this.manager.setChanges(false);
+		this.view.updateRect();
 	}
 
 	@Override
 	public void moveFiguresInLayers(LAYER_MOVE move) {
-		// TODO Auto-generated method stub
-
+		if (move == DrawingListener.LAYER_MOVE.TOP) {
+			this.manager.moveToTop(this.manager.getSelection());
+		}
+		else if (move == DrawingListener.LAYER_MOVE.BOTTOM) {
+			this.manager.moveToBottom(this.manager.getSelection());
+		}
+		else if (move == DrawingListener.LAYER_MOVE.UP) {
+			this.manager.moveUp(this.manager.getSelection());
+		}
+		else if (move == DrawingListener.LAYER_MOVE.DOWN) {
+			this.manager.moveDown(this.manager.getSelection());
+		}
+		this.view.updateRect();
 	}
 
-	@Override
-	public void pasteFigures() {
-		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public void saveModel(String fileName) {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public void selectFigure(Point pos, boolean shiftPressed) {
@@ -103,8 +146,8 @@ public class EventHandler implements DrawingListener {
 
 	@Override
 	public void sortFigures() {
-		// TODO Auto-generated method stub
-
+		this.manager.sort();
+		this.view.updateRect();
 	}
 
 	@Override
@@ -133,8 +176,8 @@ public class EventHandler implements DrawingListener {
 
 	@Override
 	public void ungroupFigures() {
-		// TODO Auto-generated method stub
-
+		manager.ungroupSelectedShapes();
+		this.view.updateRect();
 	}
 
 	@Override
@@ -142,7 +185,6 @@ public class EventHandler implements DrawingListener {
 		Shape topShape = this.manager.getTopShape();
 		
 		topShape.setDimension(new Dimension(pos.x - topShape.getOrigin().x, pos.y - topShape.getOrigin().y));
-		topShape.update();
 		
 		this.view.updateRect();
 	}

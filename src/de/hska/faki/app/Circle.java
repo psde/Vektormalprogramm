@@ -40,11 +40,4 @@ public class Circle extends Shape{
 		Circle newCircle = new Circle((Point)this.origin.clone(), this.dimension.width, this.color);
 		return newCircle;
 	}
-	
-	@Override
-	public void update() {
-		// TODO Auto-generated method stub
-		
-	}
-	
 }

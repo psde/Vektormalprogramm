@@ -37,10 +37,4 @@ public class Line extends Shape{
 		return newLine;
 	}
 	
-	@Override
-	public void update() {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

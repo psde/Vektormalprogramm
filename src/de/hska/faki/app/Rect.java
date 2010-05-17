@@ -32,11 +32,5 @@ public class Rect extends Shape{
 		Rect newRect = new Rect((Point)this.origin.clone(), (Dimension)this.dimension.clone(), this.color);
 		return newRect;
 	}
-	
-	@Override
-	public void update() {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

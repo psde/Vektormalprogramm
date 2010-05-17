@@ -29,6 +29,11 @@ public class Group extends Shape{
 		updateCoordinates();
 	}
 	
+	public ArrayList<Shape> getShapes()
+	{
+		return this.shapes;
+	}
+	
 	private void updateCoordinates()
 	{
 		if(this.shapes.size() == 0)
@@ -91,12 +96,6 @@ public class Group extends Shape{
 		for (Shape curShape : this.shapes) {
 			curShape.paintComponent(gr);
 		}
-	}
-
-	@Override
-	public void update() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
